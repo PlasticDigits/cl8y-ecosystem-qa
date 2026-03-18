@@ -1,6 +1,7 @@
 use clap::{Parser, Subcommand};
 
 mod config;
+mod issue;
 mod template;
 
 #[derive(Parser)]
@@ -52,15 +53,11 @@ fn main() {
             PassAction::Upload { file } => template::upload_pass(&file),
         },
         Commands::Bug { description, evidence } => {
-            println!("Filing bug: {}", description);
-            if let Some(ev) = evidence {
-                println!("With evidence: {}", ev);
-            }
-            // TODO: call glab issue create
+            issue::file_bug(&description, evidence.as_deref());
         }
         Commands::Report => {
             println!("Generating QA report...");
-            // TODO: read passes, count PASS/FAIL/SKIP
+            println!("TODO: read passes, count PASS/FAIL/SKIP");
         }
     }
 }
