@@ -1,7 +1,7 @@
 # YieldOmega — TimeCurve Verification Spec
 > Flow: TimeCurve Sale Lifecycle (Buy, Timer, Charms, Podium, WarBow PvP, Redemption)
 > Author: @Brouie (AVE)
-> Version: 1.0 — 2026-04-07
+> Version: 2.0 — 2026-04-09
 > Repo: yieldomega
 > Reference: docs/product/primitives.md, skills/play-timecurve-doubloon, skills/play-timecurve-warbow
 > Status legend: [CURRENT] = implemented and verified, [FUTURE] = not yet implemented
@@ -13,11 +13,11 @@
 ### 1a. Sale Lifecycle
 
 **Step 1: Sale starts**
-- [CURRENT] Admin calls startSale() -- sets saleStart, initialDeadline (canonical 24h)
-- [CURRENT] SaleStarted event emitted (startTimestamp, initialDeadline, totalTokensForSale)
+- [CURRENT] Sale auto-starts at admin-set timestamp (no manual startSale call required)
+- [CURRENT] SaleWillStart event emitted (startTimestamp, initialDeadline, totalTokensForSale)
 
 **Step 2: Buy charms**
-- [CURRENT] User specifies charmWad (0.99-10 CHARM base, scaled by exponential envelope ~25%/day)
+- [CURRENT] User specifies charmWad (1-10 CHARM in UI; 0.99 floor exists as revert protection buffer if min increases between selection and signing). Envelope scales ~20%/day
 - [CURRENT] Per-CHARM price from linear schedule: basePrice + dailyIncrement x elapsed / 1 day
 - [CURRENT] Gross spend: charmWad x priceWad / 1e18 routed through FeeRouter
 - [CURRENT] CHARM weight accrues in WAD units (plus referral bonuses as CHARM)
@@ -29,24 +29,33 @@
 **Step 3: WarBow PvP (during sale)**
 - [CURRENT] Steal: burn 1 CL8Y, drain 10% victim BP (1% if guarded), requires victim >= 2x attacker BP
 - [CURRENT] Per-victim UTC-day cap: 3 normal steals/day, 4th+ costs 50 CL8Y bypass burn
-- [CURRENT] Revenge: burn 1 CL8Y, take 10% from last stealer within 24h window
+- [CURRENT] Revenge: burn 1 CL8Y, take 10% from any attacker (sortable list of attackers with wallet, time, amount -- not limited to last stealer)
 - [CURRENT] Guard: burn 10 CL8Y, 6h guard reducing steal drain
-- [CURRENT] Flag: after buy, 300s silence window, then claim 1000 BP. Penalty (2x) if another buys after silence elapsed but before claim
+- [CURRENT] Flag: after buy, 300s silence window, then claim 1000 BP. Penalty (2x) if another buys after silence STARTS (not elapsed). Silence only ends when creator claims the flag
 
 **Step 4: Sale ends**
-- [CURRENT] Timer reaches zero, endSale() callable
+- [CURRENT] No further buys accepted once timer reaches zero. Any attempted buy triggers endSale automatically
+- [CURRENT] endSale can only be triggered once. Once triggered OR timer at zero, no further buys accepted
 - [CURRENT] SaleEnded event (endTimestamp, totalRaised, totalBuys)
-- [CURRENT] No further buys accepted. WarBow steal/guard/flag blocked post-end
+- [CURRENT] WarBow steal/guard/flag blocked post-end
 
 **Step 5: Redeem charms**
-- [CURRENT] redeemCharms() transfers launched tokens pro-rata: totalTokensForSale * charmWeight / totalCharmWeight
+- [CURRENT] Each user calls redeemCharms() themselves after endSale has been called
+- [CURRENT] On endSale, the rate of tokens per charm is fixed and stored
+- [CURRENT] Transfers launched tokens pro-rata: totalTokensForSale * charmWeight / totalCharmWeight
 - [CURRENT] CharmsRedeemed event emitted
 
 **Step 6: Distribute prizes**
 - [CURRENT] distributePrizes() pays reserve asset from PodiumPool to top-3 per category
-- [CURRENT] Three categories: Last Buy (50%), Time Booster (25%), Defended Streak (25%)
+- [CURRENT] Four categories: Last Buy (30%), WarBow (30%), Time Booster (20%), Defended Streak (20%)
 - [CURRENT] Within each: 1st:2nd:3rd = 4:2:1 payout weights
 - [CURRENT] PrizesDistributed event emitted
+
+**EndSale asset distribution:**
+- 35% burned
+- 20% prizes (podium pool)
+- 35% DOUB liquidity
+- 10% Rabbit Treasury
 
 ### 1b. Frontend (TimeCurvePage)
 
@@ -59,7 +68,9 @@
 - [CURRENT] WarBow stats: battlePoints, activeDefendedStreak, bestDefendedStreak, guardUntil, pending revenge/flag
 - [CURRENT] Fee sink display (FeeRouter: 25% locked LP, 35% CL8Y burn, 20% podium, 0% team, 20% RabbitTreasury)
 - [FUTURE] Impermanent cost/reward estimator
-- [FUTURE] WarBow action buttons on TimeCurvePage (currently via contract calls)
+- [FUTURE] WarBow needs own priority section for WarBow players
+- [FUTURE] Tabs on TimeCurvePage for each of the 4 prize categories
+- [FUTURE] WarBow action buttons (currently via contract calls)
 
 **Post-sale display:**
 - [CURRENT] Ended status, final stats
@@ -128,7 +139,7 @@
 
 | Table/Endpoint | Change | Status |
 |-------|--------|--------|
-| /v1/timecurve/buys | New row per buy with all BP fields, timer data | [CURRENT] verified 4/4 |
+| /v1/timecurve/buys | New row per buy with all BP fields, timer data. Frontend user data ONLY -- never authoritative for prizes or allocations | [CURRENT] verified 4/4 |
 | /v1/timecurve/warbow/battle-feed | Steal/revenge/guard/flag events | [CURRENT] verified 4/4 |
 | /v1/timecurve/warbow/leaderboard | Top BP rankings | [CURRENT] verified 4/4 |
 | /v1/timecurve/warbow/steals-by-victim-day | Per-victim daily steal counts | [CURRENT] verified 4/4 |
@@ -415,3 +426,4 @@
 
 *This spec is a living document. Update after each session as WarBow UI and post-sale features land.*
 *v1.0 created 2026-04-07 by @Brouie after reviewing contract (5d01bb4), indexer, frontend, and product docs.*
+*v2.0 updated 2026-04-09 by @Brouie per dev review (ecosystem-qa #4): 4 prize categories (not 3), WarBow is prize category, 30/30/20/20 split, endSale distribution 35/20/35/10, auto-start sale, revenge sortable list, flag penalty on silence start, charm 1-10 UI, envelope 20%/day.*
