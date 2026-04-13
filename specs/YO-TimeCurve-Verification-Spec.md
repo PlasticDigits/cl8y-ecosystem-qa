@@ -310,6 +310,27 @@
 | First-time user comprehension | Cognitive UX testing |
 | MEV scenario testing (mainnet) | Requires real conditions |
 
+### 5d. Live Reactivity Verification (Bot-Driven)
+
+Run bot scripts (seed-local or custom strategies) while watching the frontend. Verify real-time updates:
+
+| What to Watch | Expected Behavior | How to Verify |
+|---------------|-------------------|---------------|
+| Buy feed | New buys appear in feed within seconds of on-chain confirmation | Run seed-local, watch TimeCurvePage buy feed |
+| Price ticker | Price updates reflect each buy (linear +0.1/day, exponential min/max +20%/day) | Compare displayed price to contract state via inspect |
+| Timer reset | Timer resets to full duration after each buy | Buy near timer expiry, confirm reset in UI |
+| WarBow points | Points update when flag is claimed or defended | Run multi-wallet scenario with flag claims |
+| Podium / leaderboard | Rankings shift as new buys change standings | Watch podium cards during bot buys across wallets |
+| Envelope progress | Envelope scales visually as time progresses (~20%/day) | Check envelope display matches contract envelope state |
+| Charm accumulation | Charm count increments per buy | Buy multiple times from same wallet, verify charm count |
+| Battle feed | Attack/defend events appear in WarBow section | Run flag claim + defend sequence via bots |
+| Silence timer | Silence countdown starts when no buys occur | Stop bot buys, watch silence timer begin |
+| EndSale trigger | Sale ends when timer hits zero + buy attempted or just hits zero | Let timer expire during bot run |
+
+**Method:** Start YO Anvil stack, deploy contracts, run seed-local bot, open TimeCurvePage in browser via SSH tunnel. All items above should feel lively and responsive -- no stale data, no manual refresh needed.
+
+**Pass criteria:** All 10 items update within 5 seconds of on-chain event without page refresh.
+
 ---
 
 ## 6. Release Gate Checklist
