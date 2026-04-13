@@ -317,14 +317,14 @@ Run bot scripts (seed-local or custom strategies) while watching the frontend. V
 | What to Watch | Expected Behavior | How to Verify |
 |---------------|-------------------|---------------|
 | Buy feed | New buys appear in feed within seconds of on-chain confirmation | Run seed-local, watch TimeCurvePage buy feed |
-| Price ticker | Price updates reflect each buy (linear +0.1/day, exponential min/max +20%/day) | Compare displayed price to contract state via inspect |
-| Timer reset | Timer resets to full duration after each buy | Buy near timer expiry, confirm reset in UI |
+| Price ticker | Linear price = price per charm, min/max = amount of charm. Updates every 30ms by simulating between blocks. | Compare displayed price to contract state via inspect |
+| Timer reset | If less than 13 min remaining, resets to 15 min. Otherwise +2 min up to 96 hour cap. | Buy near timer expiry, confirm reset in UI |
 | WarBow points | Points update when flag is claimed or defended | Run multi-wallet scenario with flag claims |
 | Podium / leaderboard | Rankings shift as new buys change standings | Watch podium cards during bot buys across wallets |
 | Envelope progress | Envelope scales visually as time progresses (~20%/day) | Check envelope display matches contract envelope state |
 | Charm accumulation | Charm count increments per buy | Buy multiple times from same wallet, verify charm count |
 | Battle feed | Attack/defend events appear in WarBow section | Run flag claim + defend sequence via bots |
-| Silence timer | Silence countdown starts when no buys occur | Stop bot buys, watch silence timer begin |
+| Streak defense | Defended streak counter updates when holder defends flag against attackers | Run multi-wallet flag attack + defend sequence via bots |
 | EndSale trigger | Sale ends when timer hits zero + buy attempted or just hits zero | Let timer expire during bot run |
 
 **Method:** Start YO Anvil stack, deploy contracts, run seed-local bot, open TimeCurvePage in browser via SSH tunnel. All items above should feel lively and responsive -- no stale data, no manual refresh needed.
