@@ -1,7 +1,7 @@
 # YieldOmega — TimeCurve Verification Spec
 > Flow: TimeCurve Sale Lifecycle (Buy, Timer, Charms, Podium, WarBow PvP, Redemption)
 > Author: @Brouie (AVE)
-> Version: 2.0 — 2026-04-09
+> Version: 2.1 — 2026-04-22 (live reactivity section 5d added + dev review fixes)
 > Repo: yieldomega
 > Reference: docs/product/primitives.md, skills/play-timecurve-doubloon, skills/play-timecurve-warbow
 > Status legend: [CURRENT] = implemented and verified, [FUTURE] = not yet implemented
