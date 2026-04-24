@@ -70,7 +70,7 @@ The final section covers **incident response** — pause / circuit breaker contr
 | 2.8 | Price oracle manipulation | n/a — YO has no external oracle | n/a | n/a |
 | 2.9 | Flash loan attack | LOW — CHARM not LP'd during sale | TBD — confirm no callable hook | TBD |
 | 2.10 | Delegate call misuse | TBD | TBD | TBD |
-| 2.11 | Storage collision (proxy) | TBD — upgradeability pattern? | TBD | TBD |
+| 2.11 | Storage collision (proxy) | YES — UUPS via OZ v5.6.1 (#54 closed 4/24) | `_disableInitializers` in impl constructors + `initializer` modifier on all init funcs | OK |
 | 2.12 | Uninitialized storage | LOW | TBD | TBD |
 | 2.13 | Griefing (DoS via gas) | YES — linked-list operations | ±20-hop repair cap per spec | OK |
 | 2.14 | tx.origin misuse | TBD | TBD — grep codebase | TBD |
