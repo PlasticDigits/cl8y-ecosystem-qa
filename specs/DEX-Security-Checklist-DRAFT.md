@@ -52,7 +52,7 @@ The final section covers **incident response** — pause / circuit breaker contr
 | 1.17 | Order book spoofing (client-side) | YES — limit book rendering | `OrderBookPanel` component + route solver tests | TBD |
 | 1.18 | UI denial of service (infinite loops) | LOW | TBD | TBD |
 | 1.19 | Dependency typosquat | YES — npm install hygiene | TBD — lockfile audit | TBD |
-| 1.20 | Source map leakage | YES — prod build | TBD — confirm `sourcemap: false` in vite.config | TBD |
+| 1.20 | Source map leakage | YES — prod build | `vite.config.ts` L70 currently `sourcemap: true`, ships .js.map to prod (**FINDING #117**). Bridge sets `false` explicitly; YO uses Vite default (`false`). Fix pre-mainnet per #117. | BLOCKER pre-launch |
 
 ---
 
