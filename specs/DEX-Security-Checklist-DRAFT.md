@@ -39,7 +39,7 @@ The final section covers **incident response** — pause / circuit breaker contr
 | 1.4 | Clickjacking | YES — wallet approval flows | TBD — frame-ancestors header | TBD |
 | 1.5 | Secret leakage in bundle | YES — no secrets should ship | `frontend-dapp/src/services/terraclassic/devWallet.ts` L4-5 ships literal `DEFAULT_DEV_MNEMONIC` constant + `VITE_DEV_MNEMONIC` env-var fallback at L20 (**FINDING #118**). Runtime guard (`!DEV_MODE` throw) blocks usage but does not strip from bundle. Address is dust on-chain so no immediate loss, but pattern is bad pre-launch. | LOW pre-launch (active finding) |
 | 1.6 | Wallet connection hijack | YES — Station / Keplr / WalletConnect | TBD | TBD |
-| 1.7 | Phishing chain switch | YES — Columbus-5 vs LocalTerra | TBD — chain-id assertion | TBD |
+| 1.7 | Phishing chain switch | YES — Columbus-5 vs LocalTerra (`utils/constants.ts` L61/68/75: `localterra` / `rebel-2` / `columbus-5`) | Wallet bound to `networkConfig.chainId` at construction (`wallet.ts` L28). Per-tx broadcast (`transactions.ts` L146/201) carries no explicit chainId assertion — relies on `cosmes` adapter internal handling. No UI-side chain-mismatch detection: if connected wallet's chain differs from `networkConfig.chainId`, broadcast would proceed against whatever `cosmes` resolves. Worth a defensive equality check pre-broadcast. | TBD pending wallet-adapter audit |
 | 1.8 | Local storage tampering | LOW — session-only state | n/a | n/a |
 | 1.9 | Supply chain (deps) | YES — package-lock pinning | TBD — audit cadence | TBD |
 | 1.10 | Wallet address spoofing | YES — displayed addresses | TBD | TBD |
