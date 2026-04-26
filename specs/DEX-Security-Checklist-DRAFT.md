@@ -37,7 +37,7 @@ The final section covers **incident response** — pause / circuit breaker contr
 | 1.2 | XSS (reflected) | YES — URL query params (`?pair=`) | TBD | TBD |
 | 1.3 | CSP bypass | YES — production CSP headers | TBD — inspect prod response headers | TBD |
 | 1.4 | Clickjacking | YES — wallet approval flows | TBD — frame-ancestors header | TBD |
-| 1.5 | Secret leakage in bundle | YES — no secrets should ship | TBD — scan prod bundle | TBD |
+| 1.5 | Secret leakage in bundle | YES — no secrets should ship | `frontend-dapp/src/services/terraclassic/devWallet.ts` L4-5 ships literal `DEFAULT_DEV_MNEMONIC` constant + `VITE_DEV_MNEMONIC` env-var fallback at L20 (**FINDING #118**). Runtime guard (`!DEV_MODE` throw) blocks usage but does not strip from bundle. Address is dust on-chain so no immediate loss, but pattern is bad pre-launch. | LOW pre-launch (active finding) |
 | 1.6 | Wallet connection hijack | YES — Station / Keplr / WalletConnect | TBD | TBD |
 | 1.7 | Phishing chain switch | YES — Columbus-5 vs LocalTerra | TBD — chain-id assertion | TBD |
 | 1.8 | Local storage tampering | LOW — session-only state | n/a | n/a |
