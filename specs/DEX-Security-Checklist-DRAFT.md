@@ -52,7 +52,7 @@ The final section covers **incident response** — pause / circuit breaker contr
 | 1.17 | Order book spoofing (client-side) | YES — limit book rendering | `OrderBookPanel` component + route solver tests | TBD |
 | 1.18 | UI denial of service (infinite loops) | LOW | TBD | TBD |
 | 1.19 | Dependency typosquat | YES — npm install hygiene | TBD — lockfile audit | TBD |
-| 1.20 | Source map leakage | YES — prod build | `vite.config.ts` L70 currently `sourcemap: true`, ships .js.map to prod (**FINDING #117**). Bridge sets `false` explicitly; YO uses Vite default (`false`). Fix pre-mainnet per #117. | BLOCKER pre-launch |
+| 1.20 | Source map leakage | NO — prod build | Fixed by [#117](https://gitlab.com/PlasticDigits/cl8y-dex-terraclassic/-/issues/117) (commit `0a86ba3`): `vite.config.ts` now sets `build.sourcemap` from Vite `mode`, defaulting to `false` for production. Verified 2026-05-01 — `npm run build` produces zero `*.js.map` files and no `sourceMappingURL` trailers; `--mode staging` still emits maps for non-prod pipelines. Vitest guard: `viteConfig.build.test.ts` (3 tests, all pass). | OK |
 
 ---
 
